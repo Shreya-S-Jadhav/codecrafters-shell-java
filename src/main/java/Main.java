@@ -16,13 +16,7 @@ public class Main {
             }
             else if(com.startsWith("type")){
                 String sub = com.substring(5);
-                if(sub.equals("echo")){
-                    System.out.println(sub + " is a shell builtin");
-                }
-                else if(sub.equals("exit")){
-                    System.out.println(sub + " is a shell builtin");
-                }
-                else if(sub.equals("type")){
+                if(sub.equals("echo") || sub.equals("exit") || sub.equals("type")){
                     System.out.println(sub + " is a shell builtin");
                 }
                 else{
