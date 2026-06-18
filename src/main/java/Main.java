@@ -7,12 +7,13 @@ public class Main {
         while (true){
             System.out.print("$ ");
             String com = sc.nextLine();
-            System.out.println(com + ": command not found");
-
+            
             if (com.equals("exit")){
                 break;
+            }
+            else{
+                System.out.println(com + ": command not found");
             }   
-            System.out.println(com + ": command not found");
         }
     }
 }
