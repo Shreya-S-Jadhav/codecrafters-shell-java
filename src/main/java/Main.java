@@ -6,10 +6,9 @@ public class Main {
         // TODO: Uncomment the code below to pass the first stage
         while (true){
             System.out.print("$ ");
-            String s = sc.nextLine();
-            System.out.println(s + ": command not found");
-
             String com = sc.nextLine();
+            System.out.println(com + ": command not found");
+
             if (com.equals("exit")){
                 break;
             }   
