@@ -18,13 +18,13 @@ public class Main {
             }
 
             else if (com.equals("pwd")) {
-                System.out.println(com + " is a shell builtin");
+                System.out.println(System.getProperty("user.dir"));
             }
 
             else if (com.startsWith("type")) {
                 String sub = com.substring(5);
                 if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")) {
-                    System.out.println(System.getProperty("user.dir"));
+                    System.out.println(sub + " is a shell builtin");
                 } else {
                     String path = System.getenv("PATH");
                     String[] dirs = path.split(File.pathSeparator);
