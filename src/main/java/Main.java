@@ -31,8 +31,15 @@ public class Main {
                 }
 
                 StringBuilder output = new StringBuilder();
-
                 int end = parsed.size();
+                for (int i = 1; i < end; i++) {
+    if (i > 1) {
+        output.append(" ");
+    }
+    output.append(parsed.get(i));
+}
+
+                
 
                 if (stdoutRedirectIndex != -1) {
                     end = stdoutRedirectIndex;
