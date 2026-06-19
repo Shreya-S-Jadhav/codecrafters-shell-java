@@ -17,32 +17,27 @@ public class Main {
             else if (com.startsWith("echo")) {
                 java.util.List<String> parsed = parseCommand(com);
 
-                int redirectIndex = -1;
+                int stdoutRedirectIndex = -1;
+                int stderrRedirectIndex = -1;
 
                 for (int i = 0; i < parsed.size(); i++) {
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
-                        redirectIndex = i;
+                        stdoutRedirectIndex = i;
                         break;
                     } else if (parsed.get(i).equals("2>")) {
-                        redirectIndex = i;
+                        stderrRedirectIndex = i;
                         break;
                     }
                 }
 
                 StringBuilder output = new StringBuilder();
 
-                int end = (redirectIndex == -1) ? parsed.size() : redirectIndex;
+                int end = parsed.size();
 
-                for (int i = 1; i < end; i++) {
-                    if (i > 1)
-                        output.append(" ");
-                    output.append(parsed.get(i));
-                }
-
-                if (redirectIndex != -1) {
-                    java.nio.file.Files.writeString(
-                            java.nio.file.Path.of(parsed.get(redirectIndex + 1)),
-                            output.toString() + System.lineSeparator());
+                if (stdoutRedirectIndex != -1) {
+                    end = stdoutRedirectIndex;
+                } else if (stderrRedirectIndex != -1) {
+                    end = stderrRedirectIndex;
                 } else {
                     System.out.println(output);
                 }
