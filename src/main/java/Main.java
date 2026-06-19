@@ -9,13 +9,11 @@ public class Main {
             System.out.print("$ ");
             String com = sc.nextLine();
 
-            if (com.equals("exit")) {
+            if (com.startsWith("exit")) {
                 break;
-            } 
-             else if (com.startsWith("echo")) {
+            } else if (com.startsWith("echo")) {
                 System.out.println(com.substring(5));
-            } 
-            else if (com.startsWith("type")) {
+            } else if (com.startsWith("type")) {
                 String sub = com.substring(5);
                 if (sub.equals("echo") || sub.equals("exit") || sub.equals("type")) {
                     System.out.println(sub + " is a shell builtin");
@@ -39,8 +37,7 @@ public class Main {
                         System.out.println(sub + ": not found");
                     }
                 }
-            } 
-            else {
+            } else {
                 String[] parts = com.split(" ");
                 String cmd = parts[0];
 
@@ -55,12 +52,16 @@ public class Main {
                     if (file.exists() && file.canExecute()) {
                         found = true;
 
-                        parts[0] = file.getAbsolutePath();
-
                         ProcessBuilder pb = new ProcessBuilder(parts);
+                        pb.directory(file.getParentFile());
+
+                        pb.command().set(0, file.getAbsolutePath());
+
                         pb.inheritIO();
 
                         Process process = pb.start();
+                        process.waitFor();
+                        pb.inheritIO();
                         process.waitFor();
 
                         break;
