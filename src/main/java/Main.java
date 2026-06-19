@@ -15,7 +15,15 @@ public class Main {
             }
 
             else if (com.startsWith("echo")) {
-                System.out.println(com.substring(5));
+                String output = com.substring(5);
+
+                if (output.startsWith("'") && output.endsWith("'")) {
+                    output = output.substring(1, output.length() - 1);
+                }
+
+                output = output.replace("''", "");
+
+                System.out.println(output);
             }
 
             else if (com.equals("pwd")) {
@@ -100,5 +108,33 @@ public class Main {
                 }
             }
         }
+    }
+
+    static java.util.List<String> parseCommand(String input) {
+        java.util.List<String> args = new java.util.ArrayList<>();
+
+        StringBuilder current = new StringBuilder();
+        boolean inSingleQuote = false;
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (c == '\'') {
+                inSingleQuote = !inSingleQuote;
+            } else if (c == ' ' && !inSingleQuote) {
+                if (current.length() > 0) {
+                    args.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(c);
+            }
+        }
+
+        if (current.length() > 0) {
+            args.add(current.toString());
+        }
+
+        return args;
     }
 }
