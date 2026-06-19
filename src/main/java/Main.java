@@ -32,12 +32,7 @@ public class Main {
 
                 StringBuilder output = new StringBuilder();
                 int end = parsed.size();
-                for (int i = 1; i < end; i++) {
-    if (i > 1) {
-        output.append(" ");
-    }
-    output.append(parsed.get(i));
-}
+                
 
                 
 
@@ -45,9 +40,12 @@ public class Main {
                     end = stdoutRedirectIndex;
                 } else if (stderrRedirectIndex != -1) {
                     end = stderrRedirectIndex;
-                } else {
-                    System.out.println(output);
-                }
+                } for (int i = 1; i < end; i++) {
+    if (i > 1) {
+        output.append(" ");
+    }
+    output.append(parsed.get(i));
+}
             }
 
             else if (com.equals("pwd")) {
