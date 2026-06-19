@@ -76,8 +76,10 @@ public class Main {
                     }
                 }
             } else {
-                String[] parts = com.split(" ");
-                String cmd = parts[0];
+                java.util.List<String> parsed = parseCommand(com);
+
+                String cmd = parsed.get(0);
+                String[] parts = parsed.toArray(new String[0]);
 
                 String path = System.getenv("PATH");
                 String[] dirs = path.split(File.pathSeparator);
