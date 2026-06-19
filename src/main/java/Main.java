@@ -54,7 +54,7 @@ public class Main {
 
                         ProcessBuilder pb = new ProcessBuilder(parts);
 
-                        pb.command().set(0, file.getAbsolutePath());
+                        pb.command().set(0, file.getName());
 
                         pb.inheritIO();
 
