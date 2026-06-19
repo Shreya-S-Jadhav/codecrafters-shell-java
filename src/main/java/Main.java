@@ -53,15 +53,12 @@ public class Main {
                         found = true;
 
                         ProcessBuilder pb = new ProcessBuilder(parts);
-                        pb.directory(file.getParentFile());
 
                         pb.command().set(0, file.getAbsolutePath());
 
                         pb.inheritIO();
 
                         Process process = pb.start();
-                        process.waitFor();
-                        pb.inheritIO();
                         process.waitFor();
 
                         break;
