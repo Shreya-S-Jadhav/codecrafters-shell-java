@@ -23,6 +23,9 @@ public class Main {
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
                         redirectIndex = i;
                         break;
+                    } else if (parsed.get(i).equals("2>")) {
+                        redirectIndex = i;
+                        break;
                     }
                 }
 
@@ -99,14 +102,21 @@ public class Main {
 
                 String cmd = parsed.get(0);
 
-                File redirectFile = null;
+                File stdoutFile = null;
+                File stderrFile = null;
 
                 for (int i = 0; i < parsed.size(); i++) {
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
-                        redirectFile = new File(parsed.get(i + 1));
+                        stdoutFile = new File(parsed.get(i + 1));
 
                         parsed = new java.util.ArrayList<>(parsed.subList(0, i));
+                        break;
+                    }
 
+                    if (parsed.get(i).equals("2>")) {
+                        stderrFile = new File(parsed.get(i + 1));
+
+                        parsed = new java.util.ArrayList<>(parsed.subList(0, i));
                         break;
                     }
                 }
@@ -128,9 +138,12 @@ public class Main {
 
                         pb.command().set(0, file.getName());
 
-                        if (redirectFile != null) {
-                            pb.redirectOutput(redirectFile);
+                        if (stdoutFile != null) {
+                            pb.redirectOutput(stdoutFile);
                             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                        } else if (stderrFile != null) {
+                            pb.redirectError(stderrFile);
+                            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                         } else {
                             pb.inheritIO();
                         }
