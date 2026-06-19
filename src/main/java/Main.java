@@ -15,15 +15,14 @@ public class Main {
             }
 
             else if (com.startsWith("echo")) {
-                String output = com.substring(5);
+                java.util.List<String> parsed = parseCommand(com);
 
-                if (output.startsWith("'") && output.endsWith("'")) {
-                    output = output.substring(1, output.length() - 1);
+                for (int i = 1; i < parsed.size(); i++) {
+                    if (i > 1)
+                        System.out.print(" ");
+                    System.out.print(parsed.get(i));
                 }
-
-                output = output.replace("''", "");
-
-                System.out.println(output);
+                System.out.println();
             }
 
             else if (com.equals("pwd")) {
