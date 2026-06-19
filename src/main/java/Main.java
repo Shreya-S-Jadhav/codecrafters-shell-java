@@ -122,10 +122,27 @@ public class Main {
         for (int i = 0; i < input.length(); i++) {
     char c = input.charAt(i);
 
+    // Outside quotes
     if (!inSingleQuote && !inDoubleQuote && c == '\\') {
         if (i + 1 < input.length()) {
             current.append(input.charAt(i + 1));
             i++;
+        }
+    }
+
+    // Inside double quotes
+    else if (inDoubleQuote && c == '\\') {
+        if (i + 1 < input.length()) {
+            char next = input.charAt(i + 1);
+
+            if (next == '"' || next == '\\') {
+                current.append(next);
+                i++;
+            } else {
+                current.append('\\');
+            }
+        } else {
+            current.append('\\');
         }
     }
 
