@@ -4,6 +4,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
+        String currentDir = System.getProperty("user.dir");
         // TODO: Uncomment the code below to pass the first stage
         while (true) {
             System.out.print("$ ");
@@ -11,19 +12,31 @@ public class Main {
 
             if (com.startsWith("exit")) {
                 break;
-            } 
-            
+            }
+
             else if (com.startsWith("echo")) {
                 System.out.println(com.substring(5));
             }
 
             else if (com.equals("pwd")) {
-                System.out.println(System.getProperty("user.dir"));
+                System.out.println(currentDir);
+            }
+
+            else if (com.startsWith("cd ")) {
+                String dirName = com.substring(3);
+
+                File dir = new File(dirName);
+
+                if (dir.exists() && dir.isDirectory()) {
+                    currentDir = dir.getAbsolutePath();
+                } else {
+                    System.out.println("cd: " + dirName + ": No such file or directory");
+                }
             }
 
             else if (com.startsWith("type")) {
                 String sub = com.substring(5);
-                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")) {
+                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd") || sub.equals("cd")) {
                     System.out.println(sub + " is a shell builtin");
                 } else {
                     String path = System.getenv("PATH");
