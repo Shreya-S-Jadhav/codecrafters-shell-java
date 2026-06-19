@@ -112,37 +112,47 @@ public class Main {
     }
 
     static java.util.List<String> parseCommand(String input) {
-    java.util.List<String> args = new java.util.ArrayList<>();
+        java.util.List<String> args = new java.util.ArrayList<>();
 
-    StringBuilder current = new StringBuilder();
+        StringBuilder current = new StringBuilder();
 
-    boolean inSingleQuote = false;
-    boolean inDoubleQuote = false;
+        boolean inSingleQuote = false;
+        boolean inDoubleQuote = false;
 
-    for (int i = 0; i < input.length(); i++) {
-        char c = input.charAt(i);
+        for (int i = 0; i < input.length(); i++) {
+    char c = input.charAt(i);
 
-        if (c == '\'' && !inDoubleQuote) {
-            inSingleQuote = !inSingleQuote;
-        }
-        else if (c == '"' && !inSingleQuote) {
-            inDoubleQuote = !inDoubleQuote;
-        }
-        else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
-            if (current.length() > 0) {
-                args.add(current.toString());
-                current.setLength(0);
-            }
-        }
-        else {
-            current.append(c);
+    if (!inSingleQuote && !inDoubleQuote && c == '\\') {
+        if (i + 1 < input.length()) {
+            current.append(input.charAt(i + 1));
+            i++;
         }
     }
 
-    if (current.length() > 0) {
-        args.add(current.toString());
+    else if (c == '\'' && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote;
     }
 
-    return args;
+    else if (c == '"' && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote;
+    }
+
+    else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
+        if (current.length() > 0) {
+            args.add(current.toString());
+            current.setLength(0);
+        }
+    }
+
+    else {
+        current.append(c);
+    }
 }
+
+        if (current.length() > 0) {
+            args.add(current.toString());
+        }
+
+        return args;
+    }
 }
