@@ -25,18 +25,26 @@ public class Main {
             else if (com.startsWith("cd ")) {
                 String dirName = com.substring(3);
 
-                File dir = new File(dirName);
+                File dir;
+
+                if (dirName.startsWith("/")) {
+                    dir = new File(dirName);
+                } else {
+                    dir = new File(currentDir, dirName);
+                }
 
                 if (dir.exists() && dir.isDirectory()) {
-                    currentDir = dir.getAbsolutePath();
+                    currentDir = dir.getCanonicalPath();
                 } else {
                     System.out.println("cd: " + dirName + ": No such file or directory");
                 }
+
             }
 
             else if (com.startsWith("type")) {
                 String sub = com.substring(5);
-                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd") || sub.equals("cd")) {
+                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")
+                        || sub.equals("cd")) {
                     System.out.println(sub + " is a shell builtin");
                 } else {
                     String path = System.getenv("PATH");
