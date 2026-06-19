@@ -112,30 +112,37 @@ public class Main {
     }
 
     static java.util.List<String> parseCommand(String input) {
-        java.util.List<String> args = new java.util.ArrayList<>();
+    java.util.List<String> args = new java.util.ArrayList<>();
 
-        StringBuilder current = new StringBuilder();
-        boolean inSingleQuote = false;
+    StringBuilder current = new StringBuilder();
 
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
+    boolean inSingleQuote = false;
+    boolean inDoubleQuote = false;
 
-            if (c == '\'') {
-                inSingleQuote = !inSingleQuote;
-            } else if (c == ' ' && !inSingleQuote) {
-                if (current.length() > 0) {
-                    args.add(current.toString());
-                    current.setLength(0);
-                }
-            } else {
-                current.append(c);
+    for (int i = 0; i < input.length(); i++) {
+        char c = input.charAt(i);
+
+        if (c == '\'' && !inDoubleQuote) {
+            inSingleQuote = !inSingleQuote;
+        }
+        else if (c == '"' && !inSingleQuote) {
+            inDoubleQuote = !inDoubleQuote;
+        }
+        else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
+            if (current.length() > 0) {
+                args.add(current.toString());
+                current.setLength(0);
             }
         }
-
-        if (current.length() > 0) {
-            args.add(current.toString());
+        else {
+            current.append(c);
         }
-
-        return args;
     }
+
+    if (current.length() > 0) {
+        args.add(current.toString());
+    }
+
+    return args;
+}
 }
