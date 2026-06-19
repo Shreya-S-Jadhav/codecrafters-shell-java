@@ -23,7 +23,7 @@ public class Main {
 
             else if (com.startsWith("type")) {
                 String sub = com.substring(5);
-                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type")) {
+                if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")) {
                     System.out.println(sub + " is a shell builtin");
                 } else {
                     String path = System.getenv("PATH");
