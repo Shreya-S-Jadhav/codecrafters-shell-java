@@ -1,4 +1,6 @@
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Main {
@@ -32,20 +34,32 @@ public class Main {
 
                 StringBuilder output = new StringBuilder();
                 int end = parsed.size();
-                
-
-                
 
                 if (stdoutRedirectIndex != -1) {
                     end = stdoutRedirectIndex;
                 } else if (stderrRedirectIndex != -1) {
                     end = stderrRedirectIndex;
-                } for (int i = 1; i < end; i++) {
-    if (i > 1) {
-        output.append(" ");
-    }
-    output.append(parsed.get(i));
-}
+                }
+                for (int i = 1; i < end; i++) {
+                    if (i > 1) {
+                        output.append(" ");
+                    }
+                    output.append(parsed.get(i));
+                }
+
+                if (stdoutRedirectIndex != -1) {
+                    Files.writeString(
+                            Path.of(parsed.get(stdoutRedirectIndex + 1)),
+                            output.toString() + System.lineSeparator());
+                } else if (stderrRedirectIndex != -1) {
+                    Files.writeString(
+                            Path.of(parsed.get(stderrRedirectIndex + 1)),
+                            "");
+
+                    System.out.println(output);
+                } else {
+                    System.out.println(output);
+                }
             }
 
             else if (com.equals("pwd")) {
