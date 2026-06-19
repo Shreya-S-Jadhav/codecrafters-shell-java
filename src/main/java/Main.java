@@ -18,7 +18,7 @@ public class Main {
             }
 
             else if (com.equals("pwd")) {
-                System.out.println(System.getProperty("user.dir"));
+                System.out.println(com + " is a shell builtin");
             }
 
             else if (com.startsWith("type")) {
