@@ -26,8 +26,9 @@ public class Main {
                 String dirName = com.substring(3);
 
                 File dir;
-
-                if (dirName.startsWith("/")) {
+                if (dirName.equals("~")) {
+                    dir = new File(System.getenv("HOME"));
+                } else if (dirName.startsWith("/")) {
                     dir = new File(dirName);
                 } else {
                     dir = new File(currentDir, dirName);
