@@ -11,9 +11,17 @@ public class Main {
 
             if (com.startsWith("exit")) {
                 break;
-            } else if (com.startsWith("echo")) {
+            } 
+            
+            else if (com.startsWith("echo")) {
                 System.out.println(com.substring(5));
-            } else if (com.startsWith("type")) {
+            }
+
+            else if (com.equals("pwd")) {
+                System.out.println(System.getProperty("user.dir"));
+            }
+
+            else if (com.startsWith("type")) {
                 String sub = com.substring(5);
                 if (sub.equals("echo") || sub.equals("exit") || sub.equals("type")) {
                     System.out.println(sub + " is a shell builtin");
