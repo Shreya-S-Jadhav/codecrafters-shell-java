@@ -17,12 +17,32 @@ public class Main {
             else if (com.startsWith("echo")) {
                 java.util.List<String> parsed = parseCommand(com);
 
-                for (int i = 1; i < parsed.size(); i++) {
-                    if (i > 1)
-                        System.out.print(" ");
-                    System.out.print(parsed.get(i));
+                int redirectIndex = -1;
+
+                for (int i = 0; i < parsed.size(); i++) {
+                    if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
+                        redirectIndex = i;
+                        break;
+                    }
                 }
-                System.out.println();
+
+                StringBuilder output = new StringBuilder();
+
+                int end = (redirectIndex == -1) ? parsed.size() : redirectIndex;
+
+                for (int i = 1; i < end; i++) {
+                    if (i > 1)
+                        output.append(" ");
+                    output.append(parsed.get(i));
+                }
+
+                if (redirectIndex != -1) {
+                    java.nio.file.Files.writeString(
+                            java.nio.file.Path.of(parsed.get(redirectIndex + 1)),
+                            output.toString() + System.lineSeparator());
+                } else {
+                    System.out.println(output);
+                }
             }
 
             else if (com.equals("pwd")) {
@@ -78,6 +98,19 @@ public class Main {
                 java.util.List<String> parsed = parseCommand(com);
 
                 String cmd = parsed.get(0);
+
+                File redirectFile = null;
+
+                for (int i = 0; i < parsed.size(); i++) {
+                    if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
+                        redirectFile = new File(parsed.get(i + 1));
+
+                        parsed = new java.util.ArrayList<>(parsed.subList(0, i));
+
+                        break;
+                    }
+                }
+
                 String[] parts = parsed.toArray(new String[0]);
 
                 String path = System.getenv("PATH");
@@ -95,7 +128,12 @@ public class Main {
 
                         pb.command().set(0, file.getName());
 
-                        pb.inheritIO();
+                        if (redirectFile != null) {
+                            pb.redirectOutput(redirectFile);
+                            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+                        } else {
+                            pb.inheritIO();
+                        }
 
                         Process process = pb.start();
                         process.waitFor();
@@ -120,51 +158,51 @@ public class Main {
         boolean inDoubleQuote = false;
 
         for (int i = 0; i < input.length(); i++) {
-    char c = input.charAt(i);
+            char c = input.charAt(i);
 
-    // Outside quotes
-    if (!inSingleQuote && !inDoubleQuote && c == '\\') {
-        if (i + 1 < input.length()) {
-            current.append(input.charAt(i + 1));
-            i++;
-        }
-    }
-
-    // Inside double quotes
-    else if (inDoubleQuote && c == '\\') {
-        if (i + 1 < input.length()) {
-            char next = input.charAt(i + 1);
-
-            if (next == '"' || next == '\\') {
-                current.append(next);
-                i++;
-            } else {
-                current.append('\\');
+            // Outside quotes
+            if (!inSingleQuote && !inDoubleQuote && c == '\\') {
+                if (i + 1 < input.length()) {
+                    current.append(input.charAt(i + 1));
+                    i++;
+                }
             }
-        } else {
-            current.append('\\');
+
+            // Inside double quotes
+            else if (inDoubleQuote && c == '\\') {
+                if (i + 1 < input.length()) {
+                    char next = input.charAt(i + 1);
+
+                    if (next == '"' || next == '\\') {
+                        current.append(next);
+                        i++;
+                    } else {
+                        current.append('\\');
+                    }
+                } else {
+                    current.append('\\');
+                }
+            }
+
+            else if (c == '\'' && !inDoubleQuote) {
+                inSingleQuote = !inSingleQuote;
+            }
+
+            else if (c == '"' && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+            }
+
+            else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
+                if (current.length() > 0) {
+                    args.add(current.toString());
+                    current.setLength(0);
+                }
+            }
+
+            else {
+                current.append(c);
+            }
         }
-    }
-
-    else if (c == '\'' && !inDoubleQuote) {
-        inSingleQuote = !inSingleQuote;
-    }
-
-    else if (c == '"' && !inSingleQuote) {
-        inDoubleQuote = !inDoubleQuote;
-    }
-
-    else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
-        if (current.length() > 0) {
-            args.add(current.toString());
-            current.setLength(0);
-        }
-    }
-
-    else {
-        current.append(c);
-    }
-}
 
         if (current.length() > 0) {
             args.add(current.toString());
