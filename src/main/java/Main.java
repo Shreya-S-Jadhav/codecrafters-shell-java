@@ -96,6 +96,10 @@ public class Main {
                 System.out.println(currentDir);
             }
 
+            else if (com.equals("jobs")) {
+
+            }
+
             else if (com.startsWith("cd ")) {
                 String dirName = com.substring(3);
 
@@ -119,7 +123,7 @@ public class Main {
             else if (com.startsWith("type")) {
                 String sub = com.substring(5);
                 if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")
-                        || sub.equals("cd")) {
+                        || sub.equals("cd") || sub.equals("jobs")) {
                     System.out.println(sub + " is a shell builtin");
                 } else {
                     String path = System.getenv("PATH");
