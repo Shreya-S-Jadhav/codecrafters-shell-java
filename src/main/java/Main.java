@@ -239,7 +239,6 @@ public class Main {
                 }
             } else {
                 java.util.List<String> parsed = parseCommand(com);
-                System.out.println(parsed);
 
                 if (parsed.contains("|")) {
 
