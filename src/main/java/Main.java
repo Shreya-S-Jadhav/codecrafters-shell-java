@@ -251,27 +251,28 @@ public class Main {
                     String left = leftCmd.get(0);
                     String right = rightCmd.get(0);
 
+                    System.out.println("LEFT=" + leftCmd);
+                    System.out.println("RIGHT=" + rightCmd);
+
                     if (left.equals("echo")) {
 
                         StringBuilder output = new StringBuilder();
 
                         for (int i = 1; i < leftCmd.size(); i++) {
-                            if (i > 1)
+                            if (i > 1) {
                                 output.append(" ");
-
+                            }
                             output.append(leftCmd.get(i));
                         }
 
                         ProcessBuilder pb = new ProcessBuilder(rightCmd);
 
-                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-
                         Process p = pb.start();
 
-                        p.getOutputStream().write(
-                                (output.toString() + "\n").getBytes());
-
-                        p.getOutputStream().close();
+                        try (java.io.OutputStream os = p.getOutputStream()) {
+                            os.write((output.toString() + "\n").getBytes());
+                            os.flush();
+                        }
 
                         p.getInputStream().transferTo(System.out);
 
