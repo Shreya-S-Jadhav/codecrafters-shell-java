@@ -19,6 +19,42 @@ public class Main {
         }
     }
 
+    static void reapJobs(java.util.List<Job> jobs) {
+
+    java.util.List<Job> completedJobs =
+            new java.util.ArrayList<>();
+
+    for (int i = 0; i < jobs.size(); i++) {
+
+        Job job = jobs.get(i);
+
+        if (!job.process.isAlive()) {
+
+            String marker = " ";
+
+            if (i == jobs.size() - 1) {
+                marker = "+";
+            } else if (i == jobs.size() - 2) {
+                marker = "-";
+            }
+
+            String commandWithoutAmp =
+                    job.command.replaceAll("\\s*&\\s*$", "");
+
+            System.out.printf(
+                    "[%d]%s  %-24s%s%n",
+                    job.jobNumber,
+                    marker,
+                    "Done",
+                    commandWithoutAmp);
+
+            completedJobs.add(job);
+        }
+    }
+
+    jobs.removeAll(completedJobs);
+}
+
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         String currentDir = System.getProperty("user.dir");
@@ -26,8 +62,11 @@ public class Main {
         int nextJobNumber = 1;
         // TODO: Uncomment the code below to pass the first stage
         while (true) {
-            System.out.print("$ ");
-            String com = sc.nextLine();
+
+    reapJobs(jobs);
+
+    System.out.print("$ ");
+    String com = sc.nextLine();
 
             if (com.startsWith("exit")) {
                 break;
@@ -114,45 +153,25 @@ public class Main {
             }
 
             else if (com.equals("jobs")) {
-                java.util.List<Job> completedJobs = new java.util.ArrayList<>();
+                 for (int i = 0; i < jobs.size(); i++) {
 
-                for (int i = 0; i < jobs.size(); i++) {
+        String marker = " ";
 
-                    String marker = " ";
+        if (i == jobs.size() - 1) {
+            marker = "+";
+        } else if (i == jobs.size() - 2) {
+            marker = "-";
+        }
 
-                    if (i == jobs.size() - 1) {
-                        marker = "+";
-                    } else if (i == jobs.size() - 2) {
-                        marker = "-";
-                    }
+        Job job = jobs.get(i);
 
-                    Job job = jobs.get(i);
-
-                    if (job.process.isAlive()) {
-
-                        System.out.printf(
-                                "[%d]%s  %-24s%s%n",
-                                job.jobNumber,
-                                marker,
-                                "Running",
-                                job.command);
-
-                    } else {
-
-                        String commandWithoutAmp = job.command.replaceAll("\\s*&\\s*$", "");
-
-                        System.out.printf(
-                                "[%d]%s  %-24s%s%n",
-                                job.jobNumber,
-                                marker,
-                                "Done",
-                                commandWithoutAmp);
-
-                        completedJobs.add(job);
-                    }
-                }
-
-                jobs.removeAll(completedJobs);
+        System.out.printf(
+                "[%d]%s  %-24s%s%n",
+                job.jobNumber,
+                marker,
+                "Running",
+                job.command);
+    }
             }
 
             else if (com.startsWith("cd ")) {
