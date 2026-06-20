@@ -280,31 +280,46 @@ public class Main {
                         continue;
                     }
 
-                    if (left.equals("echo")) {
+                    if (right.equals("type")) {
 
-                        StringBuilder output = new StringBuilder();
+                        String sub = rightCmd.get(1);
 
-                        for (int i = 1; i < leftCmd.size(); i++) {
-                            if (i > 1)
-                                output.append(" ");
+                        if (sub.equals("echo")
+                                || sub.equals("exit")
+                                || sub.equals("type")
+                                || sub.equals("pwd")
+                                || sub.equals("cd")
+                                || sub.equals("jobs")) {
 
-                            output.append(leftCmd.get(i));
+                            System.out.println(
+                                    sub + " is a shell builtin");
+
+                        } else {
+
+                            String path = System.getenv("PATH");
+                            String[] dirs = path.split(File.pathSeparator);
+
+                            boolean foundBuiltin = false;
+
+                            for (String dir : dirs) {
+
+                                File file = new File(dir, sub);
+
+                                if (file.exists() && file.canExecute()) {
+
+                                    System.out.println(
+                                            sub + " is "
+                                                    + file.getAbsolutePath());
+
+                                    foundBuiltin = true;
+                                    break;
+                                }
+                            }
+
+                            if (!foundBuiltin) {
+                                System.out.println(sub + ": not found");
+                            }
                         }
-
-                        ProcessBuilder pb = new ProcessBuilder(rightCmd);
-
-                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-
-                        Process p = pb.start();
-
-                        p.getOutputStream().write(
-                                (output.toString() + "\n").getBytes());
-
-                        p.getOutputStream().close();
-
-                        p.getInputStream().transferTo(System.out);
-
-                        p.waitFor();
 
                         continue;
                     }
