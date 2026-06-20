@@ -4,9 +4,23 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Main {
+
+    static class Job {
+        int jobNumber;
+        long pid;
+        String command;
+
+        Job(int jobNumber, long pid, String command) {
+            this.jobNumber = jobNumber;
+            this.pid = pid;
+            this.command = command;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         String currentDir = System.getProperty("user.dir");
+        Job currentJob = null;
         // TODO: Uncomment the code below to pass the first stage
         while (true) {
             System.out.print("$ ");
@@ -97,7 +111,13 @@ public class Main {
             }
 
             else if (com.equals("jobs")) {
-
+                if (currentJob != null) {
+                    System.out.printf(
+                            "[%d]+  %-24s%s%n",
+                            currentJob.jobNumber,
+                            "Running",
+                            currentJob.command);
+                }
             }
 
             else if (com.startsWith("cd ")) {
@@ -233,7 +253,14 @@ public class Main {
                         Process process = pb.start();
 
                         if (background) {
+
+                            currentJob = new Job(
+                                    1,
+                                    process.pid(),
+                                    com);
+
                             System.out.println("[1] " + process.pid());
+
                         } else {
                             process.waitFor();
                         }
