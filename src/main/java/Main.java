@@ -244,29 +244,85 @@ public class Main {
 
                     int pipeIndex = parsed.indexOf("|");
 
-    java.util.List<String> leftCmd =
-            parsed.subList(0, pipeIndex);
+                    java.util.List<String> leftCmd = parsed.subList(0, pipeIndex);
 
-    java.util.List<String> rightCmd =
-            parsed.subList(pipeIndex + 1, parsed.size());
+                    java.util.List<String> rightCmd = parsed.subList(pipeIndex + 1, parsed.size());
 
-    ProcessBuilder pb1 =
-            new ProcessBuilder(leftCmd);
+                    String left = leftCmd.get(0);
+                    String right = rightCmd.get(0);
 
-    ProcessBuilder pb2 =
-            new ProcessBuilder(rightCmd);
+                    if (left.equals("echo")) {
 
-    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
-    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
-    pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                        StringBuilder output = new StringBuilder();
 
-    java.util.List<Process> processes =
-            ProcessBuilder.startPipeline(
-                    java.util.List.of(pb1, pb2));
+                        for (int i = 1; i < leftCmd.size(); i++) {
+                            if (i > 1)
+                                output.append(" ");
 
-    processes.get(processes.size() - 1).waitFor();
+                            output.append(leftCmd.get(i));
+                        }
 
-    continue;
+                        ProcessBuilder pb = new ProcessBuilder(rightCmd);
+
+                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+                        Process p = pb.start();
+
+                        p.getOutputStream().write(
+                                (output.toString() + "\n").getBytes());
+
+                        p.getOutputStream().close();
+
+                        p.getInputStream().transferTo(System.out);
+
+                        p.waitFor();
+
+                        continue;
+                    }
+
+                    if (left.equals("echo")) {
+
+                        StringBuilder output = new StringBuilder();
+
+                        for (int i = 1; i < leftCmd.size(); i++) {
+                            if (i > 1)
+                                output.append(" ");
+
+                            output.append(leftCmd.get(i));
+                        }
+
+                        ProcessBuilder pb = new ProcessBuilder(rightCmd);
+
+                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+                        Process p = pb.start();
+
+                        p.getOutputStream().write(
+                                (output.toString() + "\n").getBytes());
+
+                        p.getOutputStream().close();
+
+                        p.getInputStream().transferTo(System.out);
+
+                        p.waitFor();
+
+                        continue;
+                    }
+
+                    ProcessBuilder pb1 = new ProcessBuilder(leftCmd);
+
+                    ProcessBuilder pb2 = new ProcessBuilder(rightCmd);
+
+                    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
+                    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
+                    pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+                    java.util.List<Process> processes = ProcessBuilder.startPipeline(
+                            java.util.List.of(pb1, pb2));
+
+                    processes.get(processes.size() - 1).waitFor();
+
+                    continue;
                 }
 
                 boolean background = false;
@@ -431,13 +487,13 @@ public class Main {
 
             else if (c == '|' && !inSingleQuote && !inDoubleQuote) {
 
-    if (current.length() > 0) {
-        args.add(current.toString());
-        current.setLength(0);
-    }
+                if (current.length() > 0) {
+                    args.add(current.toString());
+                    current.setLength(0);
+                }
 
-    args.add("|");
-}
+                args.add("|");
+            }
 
             else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
                 if (current.length() > 0) {
