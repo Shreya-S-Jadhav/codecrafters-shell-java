@@ -70,7 +70,7 @@ public class Main {
                 break;
             }
 
-            else if (com.startsWith("echo")) {
+            else if (com.startsWith("echo") && !com.contains("|")) {
                 java.util.List<String> parsed = parseCommand(com);
 
                 int stdoutRedirectIndex = -1;
@@ -212,7 +212,7 @@ public class Main {
 
             }
 
-            else if (com.startsWith("type")) {
+            else if (com.startsWith("type") && !com.contains("|")) {
                 String sub = com.substring(5);
                 if (sub.equals("echo") || sub.equals("exit") || sub.equals("type") || sub.equals("pwd")
                         || sub.equals("cd") || sub.equals("jobs")) {
