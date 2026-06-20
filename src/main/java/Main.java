@@ -148,6 +148,15 @@ public class Main {
             } else {
                 java.util.List<String> parsed = parseCommand(com);
 
+                boolean background = false;
+
+                if (!parsed.isEmpty() &&
+                        parsed.get(parsed.size() - 1).equals("&")) {
+
+                    background = true;
+                    parsed.remove(parsed.size() - 1);
+                }
+
                 String cmd = parsed.get(0);
 
                 ProcessBuilder.Redirect stdoutRedirect = null;
@@ -222,7 +231,12 @@ public class Main {
                         }
 
                         Process process = pb.start();
-                        process.waitFor();
+
+                        if (background) {
+                            System.out.println("[1] " + process.pid());
+                        } else {
+                            process.waitFor();
+                        }
 
                         break;
                     }
