@@ -242,49 +242,58 @@ public class Main {
 
                 if (parsed.contains("|")) {
 
-    int pipeIndex = parsed.indexOf("|");
+                    int pipeIndex = parsed.indexOf("|");
 
-    java.util.List<String> leftCmd =
-            parsed.subList(0, pipeIndex);
+                    java.util.List<String> leftCmd = parsed.subList(0, pipeIndex);
 
-    java.util.List<String> rightCmd =
-            parsed.subList(pipeIndex + 1, parsed.size());
+                    java.util.List<String> rightCmd = parsed.subList(pipeIndex + 1, parsed.size());
 
-    ProcessBuilder pb1 =
-        new ProcessBuilder(
-                leftCmd.toArray(new String[0]));
+                    ProcessBuilder pb1 = new ProcessBuilder(
+                            leftCmd.toArray(new String[0]));
 
-ProcessBuilder pb2 =
-        new ProcessBuilder(
-                rightCmd.toArray(new String[0]));
+                    ProcessBuilder pb2 = new ProcessBuilder(
+                            rightCmd.toArray(new String[0]));
 
-    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
-    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
+                    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
+                    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-    Process p1 = pb1.start();
-    Process p2 = pb2.start();
+                    Process p1 = pb1.start();
+                    Process p2 = pb2.start();
 
-    Thread pipeThread = new Thread(() -> {
-        try (
-                java.io.InputStream in = p1.getInputStream();
-                java.io.OutputStream out = p2.getOutputStream()) {
+                    Thread pipeThread = new Thread(() -> {
+                        try (
+                                java.io.InputStream in = p1.getInputStream();
+                                java.io.OutputStream out = p2.getOutputStream()) {
 
-            in.transferTo(out);
-            out.close();
+                            in.transferTo(out);
+                            out.close();
 
-        } catch (Exception e) {
-        }
-    });
+                        } catch (Exception e) {
+                        }
+                    });
 
-    pipeThread.start();
+                    Thread outputThread = new Thread(() -> {
+                        try (
+                                java.io.InputStream in = p2.getInputStream()) {
 
-    p2.getInputStream().transferTo(System.out);
+                            in.transferTo(System.out);
 
-    p1.waitFor();
-    p2.waitFor();
+                        } catch (Exception e) {
+                        }
+                    });
 
-    continue;
-}
+                    pipeThread.start();
+                    outputThread.start();
+
+                    p2.waitFor();
+
+                    p1.destroy();
+
+                    pipeThread.join();
+                    outputThread.join();
+
+                    continue;
+                }
 
                 boolean background = false;
 
