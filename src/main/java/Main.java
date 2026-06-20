@@ -9,11 +9,13 @@ public class Main {
         int jobNumber;
         long pid;
         String command;
+        Process process;
 
-        Job(int jobNumber, long pid, String command) {
+        Job(int jobNumber, long pid, String command, Process process) {
             this.jobNumber = jobNumber;
             this.pid = pid;
             this.command = command;
+            this.process = process;
         }
     }
 
@@ -112,6 +114,8 @@ public class Main {
             }
 
             else if (com.equals("jobs")) {
+                java.util.List<Job> completedJobs = new java.util.ArrayList<>();
+
                 for (int i = 0; i < jobs.size(); i++) {
 
                     String marker = " ";
@@ -124,13 +128,31 @@ public class Main {
 
                     Job job = jobs.get(i);
 
-                    System.out.printf(
-                            "[%d]%s  %-24s%s%n",
-                            job.jobNumber,
-                            marker,
-                            "Running",
-                            job.command);
+                    if (job.process.isAlive()) {
+
+                        System.out.printf(
+                                "[%d]%s  %-24s%s%n",
+                                job.jobNumber,
+                                marker,
+                                "Running",
+                                job.command);
+
+                    } else {
+
+                        String commandWithoutAmp = job.command.replaceAll("\\s*&\\s*$", "");
+
+                        System.out.printf(
+                                "[%d]%s  %-24s%s%n",
+                                job.jobNumber,
+                                marker,
+                                "Done",
+                                commandWithoutAmp);
+
+                        completedJobs.add(job);
+                    }
                 }
+
+                jobs.removeAll(completedJobs);
             }
 
             else if (com.startsWith("cd ")) {
@@ -270,7 +292,8 @@ public class Main {
                             Job job = new Job(
                                     nextJobNumber,
                                     process.pid(),
-                                    com);
+                                    com,
+                                    process);
 
                             jobs.add(job);
 
