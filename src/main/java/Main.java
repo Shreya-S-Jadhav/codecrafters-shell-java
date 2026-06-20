@@ -23,6 +23,7 @@ public class Main {
                 int stderrRedirectIndex = -1;
 
                 boolean appendStdout = false;
+                boolean appendStderr = false;
 
                 for (int i = 0; i < parsed.size(); i++) {
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
@@ -35,6 +36,11 @@ public class Main {
                         break;
                     } else if (parsed.get(i).equals("2>")) {
                         stderrRedirectIndex = i;
+                        appendStderr = false;
+                        break;
+                    } else if (parsed.get(i).equals("2>>")) {
+                        stderrRedirectIndex = i;
+                        appendStderr = true;
                         break;
                     }
                 }
@@ -67,9 +73,18 @@ public class Main {
                                 output.toString() + System.lineSeparator());
                     }
                 } else if (stderrRedirectIndex != -1) {
-                    Files.writeString(
-                            Path.of(parsed.get(stderrRedirectIndex + 1)),
-                            "");
+
+                    if (appendStderr) {
+                        Files.writeString(
+                                Path.of(parsed.get(stderrRedirectIndex + 1)),
+                                "",
+                                java.nio.file.StandardOpenOption.CREATE,
+                                java.nio.file.StandardOpenOption.APPEND);
+                    } else {
+                        Files.writeString(
+                                Path.of(parsed.get(stderrRedirectIndex + 1)),
+                                "");
+                    }
 
                     System.out.println(output);
                 } else {
@@ -134,6 +149,8 @@ public class Main {
                 ProcessBuilder.Redirect stdoutRedirect = null;
                 ProcessBuilder.Redirect stderrRedirect = null;
 
+                boolean appendStderr = false;
+
                 for (int i = 0; i < parsed.size(); i++) {
 
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
@@ -157,6 +174,15 @@ public class Main {
                     if (parsed.get(i).equals("2>")) {
 
                         stderrRedirect = ProcessBuilder.Redirect.to(
+                                new File(parsed.get(i + 1)));
+
+                        parsed = new java.util.ArrayList<>(parsed.subList(0, i));
+                        break;
+                    }
+
+                    if (parsed.get(i).equals("2>>")) {
+
+                        stderrRedirect = ProcessBuilder.Redirect.appendTo(
                                 new File(parsed.get(i + 1)));
 
                         parsed = new java.util.ArrayList<>(parsed.subList(0, i));
