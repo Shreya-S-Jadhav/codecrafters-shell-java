@@ -251,8 +251,6 @@ public class Main {
                     String left = leftCmd.get(0);
                     String right = rightCmd.get(0);
 
-                    System.out.println("LEFT=" + leftCmd);
-                    System.out.println("RIGHT=" + rightCmd);
 
                     if (left.equals("echo")) {
 
