@@ -22,9 +22,16 @@ public class Main {
                 int stdoutRedirectIndex = -1;
                 int stderrRedirectIndex = -1;
 
+                boolean appendStdout = false;
+
                 for (int i = 0; i < parsed.size(); i++) {
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
                         stdoutRedirectIndex = i;
+                        appendStdout = false;
+                        break;
+                    } else if (parsed.get(i).equals(">>") || parsed.get(i).equals("1>>")) {
+                        stdoutRedirectIndex = i;
+                        appendStdout = true;
                         break;
                     } else if (parsed.get(i).equals("2>")) {
                         stderrRedirectIndex = i;
@@ -48,9 +55,17 @@ public class Main {
                 }
 
                 if (stdoutRedirectIndex != -1) {
-                    Files.writeString(
-                            Path.of(parsed.get(stdoutRedirectIndex + 1)),
-                            output.toString() + System.lineSeparator());
+                    if (appendStdout) {
+                        Files.writeString(
+                                Path.of(parsed.get(stdoutRedirectIndex + 1)),
+                                output.toString() + System.lineSeparator(),
+                                java.nio.file.StandardOpenOption.CREATE,
+                                java.nio.file.StandardOpenOption.APPEND);
+                    } else {
+                        Files.writeString(
+                                Path.of(parsed.get(stdoutRedirectIndex + 1)),
+                                output.toString() + System.lineSeparator());
+                    }
                 } else if (stderrRedirectIndex != -1) {
                     Files.writeString(
                             Path.of(parsed.get(stderrRedirectIndex + 1)),
@@ -116,19 +131,33 @@ public class Main {
 
                 String cmd = parsed.get(0);
 
-                File stdoutFile = null;
-                File stderrFile = null;
+                ProcessBuilder.Redirect stdoutRedirect = null;
+                ProcessBuilder.Redirect stderrRedirect = null;
 
                 for (int i = 0; i < parsed.size(); i++) {
+
                     if (parsed.get(i).equals(">") || parsed.get(i).equals("1>")) {
-                        stdoutFile = new File(parsed.get(i + 1));
+
+                        stdoutRedirect = ProcessBuilder.Redirect.to(
+                                new File(parsed.get(i + 1)));
+
+                        parsed = new java.util.ArrayList<>(parsed.subList(0, i));
+                        break;
+                    }
+
+                    if (parsed.get(i).equals(">>") || parsed.get(i).equals("1>>")) {
+
+                        stdoutRedirect = ProcessBuilder.Redirect.appendTo(
+                                new File(parsed.get(i + 1)));
 
                         parsed = new java.util.ArrayList<>(parsed.subList(0, i));
                         break;
                     }
 
                     if (parsed.get(i).equals("2>")) {
-                        stderrFile = new File(parsed.get(i + 1));
+
+                        stderrRedirect = ProcessBuilder.Redirect.to(
+                                new File(parsed.get(i + 1)));
 
                         parsed = new java.util.ArrayList<>(parsed.subList(0, i));
                         break;
@@ -152,11 +181,11 @@ public class Main {
 
                         pb.command().set(0, file.getName());
 
-                        if (stdoutFile != null) {
-                            pb.redirectOutput(stdoutFile);
+                        if (stdoutRedirect != null) {
+                            pb.redirectOutput(stdoutRedirect);
                             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                        } else if (stderrFile != null) {
-                            pb.redirectError(stderrFile);
+                        } else if (stderrRedirect != null) {
+                            pb.redirectError(stderrRedirect);
                             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                         } else {
                             pb.inheritIO();
@@ -187,7 +216,6 @@ public class Main {
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
 
-            // Outside quotes
             if (!inSingleQuote && !inDoubleQuote && c == '\\') {
                 if (i + 1 < input.length()) {
                     current.append(input.charAt(i + 1));
@@ -195,7 +223,6 @@ public class Main {
                 }
             }
 
-            // Inside double quotes
             else if (inDoubleQuote && c == '\\') {
                 if (i + 1 < input.length()) {
                     char next = input.charAt(i + 1);
