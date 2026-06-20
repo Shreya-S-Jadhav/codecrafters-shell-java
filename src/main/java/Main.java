@@ -260,6 +260,52 @@ public class Main {
 
                     commands.add(currentCommand);
 
+                    java.util.List<String> lastCommand = commands.get(commands.size() - 1);
+
+                    if (lastCommand.get(0).equals("type")) {
+
+                        String sub = lastCommand.get(1);
+
+                        if (sub.equals("echo")
+                                || sub.equals("exit")
+                                || sub.equals("type")
+                                || sub.equals("pwd")
+                                || sub.equals("cd")
+                                || sub.equals("jobs")) {
+
+                            System.out.println(sub + " is a shell builtin");
+
+                        } else {
+
+                            String path = System.getenv("PATH");
+                            String[] dirs = path.split(File.pathSeparator);
+
+                            boolean found = false;
+
+                            for (String dir : dirs) {
+
+                                File file = new File(dir, sub);
+
+                                if (file.exists() && file.canExecute()) {
+
+                                    System.out.println(
+                                            sub + " is " +
+                                                    file.getAbsolutePath());
+
+                                    found = true;
+
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
+                                System.out.println(sub + ": not found");
+                            }
+                        }
+
+                        continue;
+                    }
+
                     java.util.List<ProcessBuilder> builders = new java.util.ArrayList<>();
 
                     for (java.util.List<String> command : commands) {
