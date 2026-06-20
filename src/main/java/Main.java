@@ -21,52 +21,50 @@ public class Main {
 
     static void reapJobs(java.util.List<Job> jobs) {
 
-    java.util.List<Job> completedJobs =
-            new java.util.ArrayList<>();
+        java.util.List<Job> completedJobs = new java.util.ArrayList<>();
 
-    for (int i = 0; i < jobs.size(); i++) {
+        for (int i = 0; i < jobs.size(); i++) {
 
-        Job job = jobs.get(i);
+            Job job = jobs.get(i);
 
-        if (!job.process.isAlive()) {
+            if (!job.process.isAlive()) {
 
-            String marker = " ";
+                String marker = " ";
 
-            if (i == jobs.size() - 1) {
-                marker = "+";
-            } else if (i == jobs.size() - 2) {
-                marker = "-";
+                if (i == jobs.size() - 1) {
+                    marker = "+";
+                } else if (i == jobs.size() - 2) {
+                    marker = "-";
+                }
+
+                String commandWithoutAmp = job.command.replaceAll("\\s*&\\s*$", "");
+
+                System.out.printf(
+                        "[%d]%s  %-24s%s%n",
+                        job.jobNumber,
+                        marker,
+                        "Done",
+                        commandWithoutAmp);
+
+                completedJobs.add(job);
             }
-
-            String commandWithoutAmp =
-                    job.command.replaceAll("\\s*&\\s*$", "");
-
-            System.out.printf(
-                    "[%d]%s  %-24s%s%n",
-                    job.jobNumber,
-                    marker,
-                    "Done",
-                    commandWithoutAmp);
-
-            completedJobs.add(job);
         }
-    }
 
-    jobs.removeAll(completedJobs);
-}
+        jobs.removeAll(completedJobs);
+    }
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         String currentDir = System.getProperty("user.dir");
         java.util.List<Job> jobs = new java.util.ArrayList<>();
-        int nextJobNumber = 1;
+
         // TODO: Uncomment the code below to pass the first stage
         while (true) {
 
-    reapJobs(jobs);
+            reapJobs(jobs);
 
-    System.out.print("$ ");
-    String com = sc.nextLine();
+            System.out.print("$ ");
+            String com = sc.nextLine();
 
             if (com.startsWith("exit")) {
                 break;
@@ -328,17 +326,23 @@ public class Main {
 
                         if (background) {
 
+                            int jobNumber;
+
+                            if (jobs.isEmpty()) {
+                                jobNumber = 1;
+                            } else {
+                                jobNumber = jobs.get(jobs.size() - 1).jobNumber + 1;
+                            }
+
                             Job job = new Job(
-                                    nextJobNumber,
+                                    jobNumber,
                                     process.pid(),
                                     com,
                                     process);
 
                             jobs.add(job);
 
-                            System.out.println("[" + nextJobNumber + "] " + process.pid());
-
-                            nextJobNumber++;
+                            System.out.println("[" + jobNumber + "] " + process.pid());
 
                         } else {
                             process.waitFor();
