@@ -240,6 +240,50 @@ public class Main {
             } else {
                 java.util.List<String> parsed = parseCommand(com);
 
+                if (parsed.contains("|")) {
+
+    int pipeIndex = parsed.indexOf("|");
+
+    java.util.List<String> leftCmd =
+            parsed.subList(0, pipeIndex);
+
+    java.util.List<String> rightCmd =
+            parsed.subList(pipeIndex + 1, parsed.size());
+
+    ProcessBuilder pb1 =
+            new ProcessBuilder(new String[0]);
+
+    ProcessBuilder pb2 =
+            new ProcessBuilder(new String[0]);
+
+    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
+    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+    Process p1 = pb1.start();
+    Process p2 = pb2.start();
+
+    Thread pipeThread = new Thread(() -> {
+        try (
+                java.io.InputStream in = p1.getInputStream();
+                java.io.OutputStream out = p2.getOutputStream()) {
+
+            in.transferTo(out);
+            out.close();
+
+        } catch (Exception e) {
+        }
+    });
+
+    pipeThread.start();
+
+    p2.getInputStream().transferTo(System.out);
+
+    p1.waitFor();
+    p2.waitFor();
+
+    continue;
+}
+
                 boolean background = false;
 
                 if (!parsed.isEmpty() &&
