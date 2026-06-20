@@ -153,25 +153,45 @@ public class Main {
             }
 
             else if (com.equals("jobs")) {
-                 for (int i = 0; i < jobs.size(); i++) {
+                java.util.List<Job> completedJobs = new java.util.ArrayList<>();
 
-        String marker = " ";
+                for (int i = 0; i < jobs.size(); i++) {
 
-        if (i == jobs.size() - 1) {
-            marker = "+";
-        } else if (i == jobs.size() - 2) {
-            marker = "-";
-        }
+                    String marker = " ";
 
-        Job job = jobs.get(i);
+                    if (i == jobs.size() - 1) {
+                        marker = "+";
+                    } else if (i == jobs.size() - 2) {
+                        marker = "-";
+                    }
 
-        System.out.printf(
-                "[%d]%s  %-24s%s%n",
-                job.jobNumber,
-                marker,
-                "Running",
-                job.command);
-    }
+                    Job job = jobs.get(i);
+
+                    if (job.process.isAlive()) {
+
+                        System.out.printf(
+                                "[%d]%s  %-24s%s%n",
+                                job.jobNumber,
+                                marker,
+                                "Running",
+                                job.command);
+
+                    } else {
+
+                        String commandWithoutAmp = job.command.replaceAll("\\s*&\\s*$", "");
+
+                        System.out.printf(
+                                "[%d]%s  %-24s%s%n",
+                                job.jobNumber,
+                                marker,
+                                "Done",
+                                commandWithoutAmp);
+
+                        completedJobs.add(job);
+                    }
+                }
+
+                jobs.removeAll(completedJobs);
             }
 
             else if (com.startsWith("cd ")) {
