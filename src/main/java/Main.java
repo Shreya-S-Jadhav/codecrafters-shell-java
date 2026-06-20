@@ -1,7 +1,6 @@
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -246,24 +245,29 @@ public class Main {
 
                     int pipeIndex = parsed.indexOf("|");
 
-                    List<String> leftCmd = parsed.subList(0, pipeIndex);
+    java.util.List<String> leftCmd =
+            parsed.subList(0, pipeIndex);
 
-                    List<String> rightCmd = parsed.subList(pipeIndex + 1, parsed.size());
+    java.util.List<String> rightCmd =
+            parsed.subList(pipeIndex + 1, parsed.size());
 
-                    ProcessBuilder pb1 = new ProcessBuilder(leftCmd);
+    ProcessBuilder pb1 =
+            new ProcessBuilder(leftCmd);
 
-                    ProcessBuilder pb2 = new ProcessBuilder(rightCmd);
+    ProcessBuilder pb2 =
+            new ProcessBuilder(rightCmd);
 
-                    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
-                    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
-                    pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
+    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
+    pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
-                    java.util.List<Process> processes = ProcessBuilder.startPipeline(
-                            java.util.List.of(pb1, pb2));
+    java.util.List<Process> processes =
+            ProcessBuilder.startPipeline(
+                    java.util.List.of(pb1, pb2));
 
-                    processes.get(1).waitFor();
+    processes.get(processes.size() - 1).waitFor();
 
-                    continue;
+    continue;
                 }
 
                 boolean background = false;
@@ -425,6 +429,16 @@ public class Main {
             else if (c == '"' && !inSingleQuote) {
                 inDoubleQuote = !inDoubleQuote;
             }
+
+            else if (c == '|' && !inSingleQuote && !inDoubleQuote) {
+
+    if (current.length() > 0) {
+        args.add(current.toString());
+        current.setLength(0);
+    }
+
+    args.add("|");
+}
 
             else if (c == ' ' && !inSingleQuote && !inDoubleQuote) {
                 if (current.length() > 0) {
