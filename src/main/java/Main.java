@@ -20,7 +20,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
         String currentDir = System.getProperty("user.dir");
-        Job currentJob = null;
+        java.util.List<Job> jobs = new java.util.ArrayList<>();
+        int nextJobNumber = 1;
         // TODO: Uncomment the code below to pass the first stage
         while (true) {
             System.out.print("$ ");
@@ -111,12 +112,24 @@ public class Main {
             }
 
             else if (com.equals("jobs")) {
-                if (currentJob != null) {
+                for (int i = 0; i < jobs.size(); i++) {
+
+                    String marker = " ";
+
+                    if (i == jobs.size() - 1) {
+                        marker = "+";
+                    } else if (i == jobs.size() - 2) {
+                        marker = "-";
+                    }
+
+                    Job job = jobs.get(i);
+
                     System.out.printf(
-                            "[%d]+  %-24s%s%n",
-                            currentJob.jobNumber,
+                            "[%d]%s  %-24s%s%n",
+                            job.jobNumber,
+                            marker,
                             "Running",
-                            currentJob.command);
+                            job.command);
                 }
             }
 
@@ -254,12 +267,16 @@ public class Main {
 
                         if (background) {
 
-                            currentJob = new Job(
-                                    1,
+                            Job job = new Job(
+                                    nextJobNumber,
                                     process.pid(),
                                     com);
 
-                            System.out.println("[1] " + process.pid());
+                            jobs.add(job);
+
+                            System.out.println("[" + nextJobNumber + "] " + process.pid());
+
+                            nextJobNumber++;
 
                         } else {
                             process.waitFor();
