@@ -244,95 +244,37 @@ public class Main {
 
                     int pipeIndex = parsed.indexOf("|");
 
-                    java.util.List<String> leftCmd = parsed.subList(0, pipeIndex);
+                    java.util.List<java.util.List<String>> commands = new java.util.ArrayList<>();
 
-                    java.util.List<String> rightCmd = parsed.subList(pipeIndex + 1, parsed.size());
+                    java.util.List<String> currentCommand = new java.util.ArrayList<>();
 
-                    String left = leftCmd.get(0);
-                    String right = rightCmd.get(0);
+                    for (String token : parsed) {
 
-
-                    if (left.equals("echo")) {
-
-                        StringBuilder output = new StringBuilder();
-
-                        for (int i = 1; i < leftCmd.size(); i++) {
-                            if (i > 1) {
-                                output.append(" ");
-                            }
-                            output.append(leftCmd.get(i));
-                        }
-
-                        ProcessBuilder pb = new ProcessBuilder(rightCmd);
-
-                        Process p = pb.start();
-
-                        try (java.io.OutputStream os = p.getOutputStream()) {
-                            os.write((output.toString() + "\n").getBytes());
-                            os.flush();
-                        }
-
-                        p.getInputStream().transferTo(System.out);
-
-                        p.waitFor();
-
-                        continue;
-                    }
-
-                    if (right.equals("type")) {
-
-                        String sub = rightCmd.get(1);
-
-                        if (sub.equals("echo")
-                                || sub.equals("exit")
-                                || sub.equals("type")
-                                || sub.equals("pwd")
-                                || sub.equals("cd")
-                                || sub.equals("jobs")) {
-
-                            System.out.println(
-                                    sub + " is a shell builtin");
-
+                        if (token.equals("|")) {
+                            commands.add(currentCommand);
+                            currentCommand = new java.util.ArrayList<>();
                         } else {
-
-                            String path = System.getenv("PATH");
-                            String[] dirs = path.split(File.pathSeparator);
-
-                            boolean foundBuiltin = false;
-
-                            for (String dir : dirs) {
-
-                                File file = new File(dir, sub);
-
-                                if (file.exists() && file.canExecute()) {
-
-                                    System.out.println(
-                                            sub + " is "
-                                                    + file.getAbsolutePath());
-
-                                    foundBuiltin = true;
-                                    break;
-                                }
-                            }
-
-                            if (!foundBuiltin) {
-                                System.out.println(sub + ": not found");
-                            }
+                            currentCommand.add(token);
                         }
-
-                        continue;
                     }
 
-                    ProcessBuilder pb1 = new ProcessBuilder(leftCmd);
+                    commands.add(currentCommand);
 
-                    ProcessBuilder pb2 = new ProcessBuilder(rightCmd);
+                    java.util.List<ProcessBuilder> builders = new java.util.ArrayList<>();
 
-                    pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
-                    pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
-                    pb2.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                    for (java.util.List<String> command : commands) {
 
-                    java.util.List<Process> processes = ProcessBuilder.startPipeline(
-                            java.util.List.of(pb1, pb2));
+                        ProcessBuilder pb = new ProcessBuilder(command);
+
+                        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+                        builders.add(pb);
+                    }
+
+                    builders.get(builders.size() - 1)
+                            .redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+                    java.util.List<Process> processes = ProcessBuilder.startPipeline(builders);
 
                     processes.get(processes.size() - 1).waitFor();
 
@@ -456,6 +398,7 @@ public class Main {
                 }
             }
         }
+
     }
 
     static java.util.List<String> parseCommand(String input) {
