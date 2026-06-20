@@ -251,10 +251,12 @@ public class Main {
             parsed.subList(pipeIndex + 1, parsed.size());
 
     ProcessBuilder pb1 =
-            new ProcessBuilder(new String[0]);
+        new ProcessBuilder(
+                leftCmd.toArray(new String[0]));
 
-    ProcessBuilder pb2 =
-            new ProcessBuilder(new String[0]);
+ProcessBuilder pb2 =
+        new ProcessBuilder(
+                rightCmd.toArray(new String[0]));
 
     pb1.redirectError(ProcessBuilder.Redirect.INHERIT);
     pb2.redirectError(ProcessBuilder.Redirect.INHERIT);
